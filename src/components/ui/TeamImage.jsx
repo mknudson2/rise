@@ -55,7 +55,7 @@ const TeamImage = ({
 
         {/* Gradient overlay */}
         <div
-          className={`absolute inset-0 bg-gradient-to-t ${gradientFrom} ${gradientTo} opacity-20 group-hover:opacity-30 transition-opacity duration-300`}
+          className={`absolute inset-0 bg-gradient-to-t ${gradientFrom} ${gradientTo} opacity-10 group-hover:opacity-30 transition-opacity duration-300`}
         />
       </div>
     </div>
