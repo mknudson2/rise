@@ -1,6 +1,7 @@
 import React from "react";
 import Header from "./components/layout/Header";
 import Hero from "./components/sections/Hero";
+import RiseMethod from "./components/sections/RiseMethod";
 import ScrollingWords from "./components/sections/ScrollingWords";
 import SuccessPathways from "./components/sections/SuccessPathways";
 import Testimonials from "./components/sections/Testimonials";
@@ -20,6 +21,7 @@ const App = () => {
       <ScrollingWords />
       <SuccessPathways openContactModal={openModal} />
       <Testimonials openContactModal={openModal} />
+      <RiseMethod openContactModal={openModal} />
       <Team openContactModal={openModal} />
       <FAQ />
       <Contact openContactModal={openModal} />
