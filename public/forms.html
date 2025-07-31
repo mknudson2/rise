@@ -1,0 +1,97 @@
+<!-- This file should be placed in your /public directory -->
+<!-- Netlify needs to see these forms at build time to enable form handling -->
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>RISE Contact Forms - Hidden</title>
+    <meta name="robots" content="noindex">
+</head>
+
+<body>
+    <!-- Consultation Form -->
+    <form name="rise-consultation" data-netlify="true" data-netlify-honeypot="bot-field" hidden>
+        <input type="hidden" name="form-name" value="rise-consultation" />
+        <input type="hidden" name="form-type" value="consultation" />
+        <input type="hidden" name="form-title" value="Free Consultation" />
+
+        <!-- Honeypot -->
+        <input name="bot-field" />
+
+        <!-- Form fields -->
+        <input type="text" name="name" />
+        <input type="email" name="email" />
+        <input type="tel" name="phone" />
+        <select name="injuryType">
+            <option value="Stroke">Stroke</option>
+            <option value="Spinal Cord Injury">Spinal Cord Injury</option>
+            <option value="Other Neurological Condition">Other Neurological Condition</option>
+            <option value="Family Member/Caregiver">Family Member/Caregiver</option>
+        </select>
+        <select name="timeframe">
+            <option value="Less than 6 months">Less than 6 months</option>
+            <option value="6 months - 1 year">6 months - 1 year</option>
+            <option value="1-2 years">1-2 years</option>
+            <option value="2-5 years">2-5 years</option>
+            <option value="More than 5 years">More than 5 years</option>
+            <option value="N/A - Family Member">N/A - Family Member</option>
+        </select>
+        <textarea name="goals"></textarea>
+    </form>
+
+    <!-- Professional Training Form -->
+    <form name="rise-professional" data-netlify="true" data-netlify-honeypot="bot-field" hidden>
+        <input type="hidden" name="form-name" value="rise-professional" />
+        <input type="hidden" name="form-type" value="professional" />
+        <input type="hidden" name="form-title" value="Professional Training Inquiry" />
+
+        <!-- Honeypot -->
+        <input name="bot-field" />
+
+        <!-- Form fields -->
+        <input type="text" name="name" />
+        <input type="email" name="email" />
+        <input type="tel" name="phone" />
+        <input type="text" name="organization" />
+        <select name="experience">
+            <option value="Occupational Therapist">Occupational Therapist</option>
+            <option value="Physical Therapist">Physical Therapist</option>
+            <option value="Student (OT/PT)">Student (OT/PT)</option>
+            <option value="Other Healthcare Professional">Other Healthcare Professional</option>
+            <option value="Fitness Professional">Fitness Professional</option>
+        </select>
+        <select name="timeframe">
+            <option value="Next 3 months">Next 3 months</option>
+            <option value="3-6 months">3-6 months</option>
+            <option value="6-12 months">6-12 months</option>
+            <option value="Just exploring options">Just exploring options</option>
+        </select>
+        <textarea name="goals"></textarea>
+    </form>
+
+    <!-- General Inquiry Form -->
+    <form name="rise-general" data-netlify="true" data-netlify-honeypot="bot-field" hidden>
+        <input type="hidden" name="form-name" value="rise-general" />
+        <input type="hidden" name="form-type" value="general" />
+        <input type="hidden" name="form-title" value="General Inquiry" />
+
+        <!-- Honeypot -->
+        <input name="bot-field" />
+
+        <!-- Form fields -->
+        <input type="text" name="name" />
+        <input type="email" name="email" />
+        <input type="tel" name="phone" />
+        <select name="type">
+            <option value="General Information">General Information</option>
+            <option value="Partnership Opportunity">Partnership Opportunity</option>
+            <option value="Media Inquiry">Media Inquiry</option>
+            <option value="Research Collaboration">Research Collaboration</option>
+            <option value="Other">Other</option>
+        </select>
+        <textarea name="message"></textarea>
+    </form>
+</body>
+
+</html>
