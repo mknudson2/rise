@@ -46,7 +46,7 @@ const Hero = ({ openContactModal }) => {
             cutting-edge, evidence-based, neuro-fitness techniques that are
             producing statistically significant gains that are simply
             remarkable. The mind-blowing fact is that these results occur after
-            a 3-5 DAY high-intensity boot camp that in some cases, "traditional"
+            a 3-5 day high-intensity boot camp that in some cases, "traditional"
             techniques aren't achieving after up to 10 months.
           </motion.p>
 

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { testimonials } from "../../utils/constants";
 import { getTypeColor, getTypeIcon } from "../../utils/formHelpers";
@@ -8,6 +8,49 @@ import Button from "../ui/Button";
 const Testimonials = ({ openContactModal }) => {
   const { currentTestimonial, setCurrentTestimonial } =
     useTestimonials(testimonials);
+  const scrollContainerRef = useRef(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [scrollLeft, setScrollLeft] = useState(0);
+
+  // Drag to scroll functionality
+  const handleMouseDown = (e) => {
+    setIsDragging(true);
+    setStartX(e.pageX - scrollContainerRef.current.offsetLeft);
+    setScrollLeft(scrollContainerRef.current.scrollLeft);
+    scrollContainerRef.current.style.cursor = "grabbing";
+    scrollContainerRef.current.style.userSelect = "none";
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.style.cursor = "grab";
+      scrollContainerRef.current.style.userSelect = "auto";
+    }
+  };
+
+  const handleMouseMove = (e) => {
+    if (!isDragging) return;
+    e.preventDefault();
+    const x = e.pageX - scrollContainerRef.current.offsetLeft;
+    const walk = (x - startX) * 2; // Multiply by 2 for faster scrolling
+    scrollContainerRef.current.scrollLeft = scrollLeft - walk;
+  };
+
+  const handleMouseLeave = () => {
+    setIsDragging(false);
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.style.cursor = "grab";
+      scrollContainerRef.current.style.userSelect = "auto";
+    }
+  };
+
+  // Add global mouse up listener
+  useEffect(() => {
+    document.addEventListener("mouseup", handleMouseUp);
+    return () => document.removeEventListener("mouseup", handleMouseUp);
+  }, []);
 
   return (
     <section
@@ -85,54 +128,64 @@ const Testimonials = ({ openContactModal }) => {
           </AnimatePresence>
         </div>
 
-        {/* Horizontal Scrolling Cards */}
-        <div className="relative">
-          <motion.div
-            className="flex gap-6 overflow-x-auto pb-4 scrollbar-hide"
-            style={{ scrollSnapType: "x mandatory" }}
-          >
-            {testimonials.map((testimonial, index) => (
-              <motion.div
-                key={index}
-                className="flex-shrink-0 w-80 bg-gray-900/50 p-6 rounded-2xl border border-gray-800 hover:border-gray-600 transition-all duration-300 cursor-pointer"
-                style={{ scrollSnapAlign: "start" }}
-                onClick={() => setCurrentTestimonial(index)}
-                whileHover={{ y: -5, scale: 1.02 }}
-                initial={{ opacity: 0, x: 20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                viewport={{ once: true }}
-              >
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="text-2xl">
-                    {getTypeIcon(testimonial.type)}
+        {/* Horizontal Scrolling Cards - Fixed structure to prevent cutoff */}
+        <div className="relative py-8 overflow-y-visible">
+          {/* Outer container allows vertical overflow */}
+          <div className="overflow-visible pt-4 pb-8">
+            <motion.div
+              ref={scrollContainerRef}
+              className="flex gap-6 overflow-x-auto pb-4 scrollbar-hide cursor-grab px-4"
+              style={{
+                scrollSnapType: "x mandatory",
+                overflowY: "visible",
+              }}
+              onMouseDown={handleMouseDown}
+              onMouseMove={handleMouseMove}
+              onMouseLeave={handleMouseLeave}
+            >
+              {testimonials.map((testimonial, index) => (
+                <motion.div
+                  key={index}
+                  className="flex-shrink-0 w-80 bg-gray-900/50 p-6 rounded-2xl border border-gray-800 hover:border-gray-600 transition-all duration-300 cursor-pointer select-none mt-4"
+                  style={{ scrollSnapAlign: "start" }}
+                  onClick={() => !isDragging && setCurrentTestimonial(index)}
+                  whileHover={{ y: -8, scale: 1.02 }}
+                  initial={{ opacity: 0, x: 20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  viewport={{ once: true }}
+                  onMouseDown={(e) => e.preventDefault()}
+                >
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="text-2xl">
+                      {getTypeIcon(testimonial.type)}
+                    </div>
+                    <div
+                      className={`px-2 py-1 rounded-full text-xs font-medium bg-gradient-to-r ${getTypeColor(
+                        testimonial.type
+                      )} text-white`}
+                    >
+                      {testimonial.type.charAt(0).toUpperCase() +
+                        testimonial.type.slice(1)}
+                    </div>
                   </div>
-                  <div
-                    className={`px-2 py-1 rounded-full text-xs font-medium bg-gradient-to-r ${getTypeColor(
-                      testimonial.type
-                    )} text-white`}
-                  >
-                    {testimonial.type.charAt(0).toUpperCase() +
-                      testimonial.type.slice(1)}
-                  </div>
-                </div>
 
-                <blockquote className="text-gray-300 text-sm leading-relaxed mb-4 line-clamp-4">
-                  "{testimonial.quote.substring(0, 120)}..."
-                </blockquote>
+                  <blockquote className="text-gray-300 text-sm leading-relaxed mb-4 line-clamp-4">
+                    "{testimonial.quote.substring(0, 120)}..."
+                  </blockquote>
 
-                <cite className="text-sm font-medium text-yellow-400">
-                  — {testimonial.author}
-                </cite>
-              </motion.div>
-            ))}
-          </motion.div>
+                  <cite className="text-sm font-medium text-yellow-400">
+                    — {testimonial.author}
+                  </cite>
+                </motion.div>
+              ))}
+            </motion.div>
+          </div>
 
-          {/* Scroll indicators */}
           <div className="flex justify-center mt-6 gap-8">
-            <button className="text-gray-400 hover:text-yellow-400 transition-colors duration-200 text-sm">
-              ← Scroll for more stories
-            </button>
+            <div className="text-gray-400 text-sm flex items-center gap-2">
+              <span>← Drag to scroll or click cards to explore →</span>
+            </div>
           </div>
         </div>
 
