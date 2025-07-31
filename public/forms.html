@@ -1,6 +1,3 @@
-<!-- This file should be placed in your /public directory -->
-<!-- Netlify needs to see these forms at build time to enable form handling -->
-
 <!DOCTYPE html>
 <html>
 
@@ -10,16 +7,16 @@
 </head>
 
 <body>
-    <!-- Consultation Form -->
-    <form name="rise-consultation" data-netlify="true" data-netlify-honeypot="bot-field" hidden>
-        <input type="hidden" name="form-name" value="rise-consultation" />
-        <input type="hidden" name="form-type" value="consultation" />
-        <input type="hidden" name="form-title" value="Free Consultation" />
+    <!-- These hidden forms allow Netlify to detect your forms at build time -->
 
-        <!-- Honeypot -->
+    <!-- Consultation Form -->
+    <form name="rise-consultation" method="POST" data-netlify="true" data-netlify-honeypot="bot-field" hidden>
+        <input type="hidden" name="form-name" value="rise-consultation" />
+
+        <!-- Honeypot for spam protection -->
         <input name="bot-field" />
 
-        <!-- Form fields -->
+        <!-- All form fields must match your React form exactly -->
         <input type="text" name="name" />
         <input type="email" name="email" />
         <input type="tel" name="phone" />
@@ -41,15 +38,13 @@
     </form>
 
     <!-- Professional Training Form -->
-    <form name="rise-professional" data-netlify="true" data-netlify-honeypot="bot-field" hidden>
+    <form name="rise-professional" method="POST" data-netlify="true" data-netlify-honeypot="bot-field" hidden>
         <input type="hidden" name="form-name" value="rise-professional" />
-        <input type="hidden" name="form-type" value="professional" />
-        <input type="hidden" name="form-title" value="Professional Training Inquiry" />
 
-        <!-- Honeypot -->
+        <!-- Honeypot for spam protection -->
         <input name="bot-field" />
 
-        <!-- Form fields -->
+        <!-- All form fields must match your React form exactly -->
         <input type="text" name="name" />
         <input type="email" name="email" />
         <input type="tel" name="phone" />
@@ -71,15 +66,13 @@
     </form>
 
     <!-- General Inquiry Form -->
-    <form name="rise-general" data-netlify="true" data-netlify-honeypot="bot-field" hidden>
+    <form name="rise-general" method="POST" data-netlify="true" data-netlify-honeypot="bot-field" hidden>
         <input type="hidden" name="form-name" value="rise-general" />
-        <input type="hidden" name="form-type" value="general" />
-        <input type="hidden" name="form-title" value="General Inquiry" />
 
-        <!-- Honeypot -->
+        <!-- Honeypot for spam protection -->
         <input name="bot-field" />
 
-        <!-- Form fields -->
+        <!-- All form fields must match your React form exactly -->
         <input type="text" name="name" />
         <input type="email" name="email" />
         <input type="tel" name="phone" />

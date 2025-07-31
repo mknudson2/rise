@@ -1,4 +1,4 @@
-// Updated ContactModal.jsx for Netlify Forms
+// Updated ContactModal.jsx - Correct Netlify Implementation
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Phone, Mail, MapPin, X } from "lucide-react";
@@ -44,33 +44,19 @@ const ContactModal = ({ isOpen, onClose, defaultForm = "consultation" }) => {
     });
   };
 
-  const encode = (data) => {
-    return Object.keys(data)
-      .map(
-        (key) => encodeURIComponent(key) + "=" + encodeURIComponent(data[key])
-      )
-      .join("&");
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
     setSubmitMessage("");
 
-    // Prepare form data for Netlify
-    const currentFormConfig = formConfigs[activeForm];
-    const formPayload = {
-      "form-name": `rise-${activeForm}`,
-      "form-type": activeForm,
-      "form-title": currentFormConfig.title,
-      ...formData,
-    };
-
     try {
+      // Encode form data for Netlify
+      const formBody = new FormData(e.target);
+
       const response = await fetch("/", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: encode(formPayload),
+        body: new URLSearchParams(formBody).toString(),
       });
 
       if (response.ok) {
@@ -244,6 +230,7 @@ const ContactModal = ({ isOpen, onClose, defaultForm = "consultation" }) => {
                         onSubmit={handleSubmit}
                         className="space-y-4"
                         name={`rise-${activeForm}`}
+                        method="POST"
                         data-netlify="true"
                         data-netlify-honeypot="bot-field"
                       >
@@ -252,16 +239,6 @@ const ContactModal = ({ isOpen, onClose, defaultForm = "consultation" }) => {
                           type="hidden"
                           name="form-name"
                           value={`rise-${activeForm}`}
-                        />
-                        <input
-                          type="hidden"
-                          name="form-type"
-                          value={activeForm}
-                        />
-                        <input
-                          type="hidden"
-                          name="form-title"
-                          value={currentForm.title}
                         />
 
                         {/* Honeypot field for spam protection */}
