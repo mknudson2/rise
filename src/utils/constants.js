@@ -74,14 +74,16 @@ export const testimonials = [
   },
 ];
 
-// Team members data
+// Team members data - Updated with real images
 export const teamMembers = [
   {
     name: "Phil Lamoreaux",
     title: "CIO - Chief Innovation Officer",
     subtitle: '"The OT Professor"',
     bio: "An Occupational Therapist and personal trainer with extensive experience in neuro-rehabilitation and high-intensity training methodologies. Phil has pioneered the evidence-based techniques that form the foundation of RISE's revolutionary approach to stroke and SCI recovery.",
-    image: "/api/placeholder/300/300",
+    image: "/assets/images/Phil.webp",
+    imageFallback: "/assets/images/Phil.PNG", // Fallback if webp not supported
+    alt: "Phil Lamoreaux, CIO and The OT Professor at RISE",
     specialties: [
       "Occupational Therapy",
       "High-Intensity Training",
@@ -95,7 +97,9 @@ export const teamMembers = [
     title: "CSO - Chief Strategy Officer",
     subtitle: "Strategic Leadership",
     bio: "Brings strategic vision and operational excellence to RISE, ensuring our innovative training methods reach those who need them most. Jason focuses on scaling our impact while maintaining the personalized, high-quality care that defines the RISE experience.",
-    image: "/api/placeholder/300/300",
+    image: "/assets/images/Jason.webp",
+    imageFallback: "/assets/images/Jason.png",
+    alt: "Jason Freed, CSO and Strategic Leader at RISE",
     specialties: ["Strategic Planning", "Operations", "Program Development"],
     gradientFrom: "from-yellow-500",
     gradientTo: "to-red-500",
@@ -105,7 +109,9 @@ export const teamMembers = [
     title: "CXO - Chief Experience Officer",
     subtitle: "Client Experience Excellence",
     bio: "Dedicated to ensuring every client and family member receives exceptional care and support throughout their RISE journey. Claire oversees the holistic experience that makes RISE bootcamps transformational beyond just the physical training.",
-    image: "/api/placeholder/300/300",
+    image: "/assets/images/claire.webp",
+    imageFallback: "/assets/images/claire.png",
+    alt: "Claire Plunkett, CXO and Client Experience Leader at RISE",
     specialties: [
       "Client Experience",
       "Family Support",

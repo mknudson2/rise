@@ -2,6 +2,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import { teamMembers } from "../../utils/constants";
 import Button from "../ui/Button";
+import TeamImage from "../ui/TeamImage";
 
 const Team = ({ openContactModal }) => {
   return (
@@ -38,19 +39,13 @@ const Team = ({ openContactModal }) => {
             >
               <div className="bg-gray-900/50 rounded-3xl border border-gray-800 overflow-hidden hover:border-gray-600 transition-all duration-500 transform group-hover:scale-105 group-hover:shadow-2xl">
                 {/* Image Section */}
-                <div className="relative overflow-hidden">
-                  <div className="aspect-square bg-gray-800 flex items-center justify-center relative">
-                    {/* Placeholder for image */}
-                    <div className="w-full h-full bg-gradient-to-br from-gray-700 to-gray-800 flex items-center justify-center">
-                      <span className="text-6xl text-gray-600">👤</span>
-                    </div>
-
-                    {/* Gradient overlay */}
-                    <div
-                      className={`absolute inset-0 bg-gradient-to-t ${member.gradientFrom} ${member.gradientTo} opacity-20 group-hover:opacity-30 transition-opacity duration-300`}
-                    />
-                  </div>
-                </div>
+                <TeamImage
+                  src={member.image}
+                  fallback={member.imageFallback}
+                  alt={member.alt}
+                  gradientFrom={member.gradientFrom}
+                  gradientTo={member.gradientTo}
+                />
 
                 {/* Content Section */}
                 <div className="p-6">
