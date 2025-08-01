@@ -7,6 +7,7 @@ const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrollY, setScrollY] = useState(0);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [showLinks, setShowLinks] = useState(false);
 
   // Track scroll position for adaptive transparency
   useEffect(() => {
@@ -19,37 +20,30 @@ const Header = () => {
       setIsScrolled(currentScrollY > heroHeight);
     };
 
-    // Add scroll listener
     window.addEventListener("scroll", handleScroll, { passive: true });
-
-    // Initial check
     handleScroll();
 
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Calculate dynamic opacity based on scroll position
-  const getNavbarOpacity = () => {
-    if (isScrolled) return 1; // Fully opaque over content sections
-
-    // Gradual transition in hero area (0 to 80vh)
-    const heroHeight = window.innerHeight * 0.8;
-    const scrollProgress = Math.min(scrollY / (heroHeight * 0.3), 1); // Start transition at 30% of hero
-    return 0.1 + scrollProgress * 0.9; // Range from 0.1 to 1.0
-  };
+  // Show links after navbar entrance animation (only set once)
+  useEffect(() => {
+    if (!showLinks) {
+      const timer = setTimeout(() => setShowLinks(true), 600); // navbar animates in 0.6s
+      return () => clearTimeout(timer);
+    }
+  }, [showLinks]);
 
   // Get background styles based on scroll state
   const getBackgroundStyles = () => {
     if (isScrolled) {
-      // Solid, premium glass morphism over content
       return {
-        background: "rgba(17, 24, 39, 0.95)", // gray-900 with high opacity
+        background: "rgba(17, 24, 39, 0.95)",
         backdropFilter: "blur(20px)",
-        borderBottom: "1px solid rgba(107, 114, 128, 0.3)", // gray-500 with opacity
+        borderBottom: "1px solid rgba(107, 114, 128, 0.3)",
         boxShadow: "0 4px 24px rgba(0, 0, 0, 0.1)",
       };
     } else {
-      // Nearly transparent over hero with subtle effects
       return {
         background: `rgba(17, 24, 39, ${
           0.1 + (scrollY / (window.innerHeight * 0.8)) * 0.4
@@ -99,30 +93,35 @@ const Header = () => {
 
           {/* Desktop Menu */}
           <div className="hidden md:flex space-x-8">
-            {navItems.map((item, index) => (
-              <motion.a
-                key={item}
-                href={`#${item.toLowerCase().replace(" ", "-")}`}
-                className={`relative font-medium transition-all duration-300 ${
-                  isScrolled
-                    ? "text-white hover:text-yellow-400"
-                    : "text-white/90 hover:text-yellow-400"
-                }`}
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.1 * index + 0.3 }}
-                whileHover={{ scale: 1.05 }}
-              >
-                {item}
-                {/* Hover underline effect */}
-                <motion.div
-                  className="absolute -bottom-1 left-0 h-0.5 bg-gradient-to-r from-red-500 to-yellow-400"
-                  initial={{ width: 0 }}
-                  whileHover={{ width: "100%" }}
-                  transition={{ duration: 0.3 }}
-                />
-              </motion.a>
-            ))}
+            {showLinks &&
+              navItems.map((item, index) => (
+                <motion.a
+                  key={item}
+                  href={`#${item.toLowerCase().replace(" ", "-")}`}
+                  className={`relative font-medium transition-all duration-300 ${
+                    isScrolled
+                      ? "text-white hover:text-yellow-400"
+                      : "text-white/90 hover:text-yellow-400"
+                  }`}
+                  initial={{ opacity: 1 }}
+                  // animate={{ opacity: 1 }}
+                  // transition={{
+                  //   duration: 1.2,
+                  //   delay: 0.12 * index,
+                  //   ease: [0.4, 0.0, 0.2, 1],
+                  // }}
+                  whileHover={{ scale: 1.05 }}
+                >
+                  {item}
+                  {/* Hover underline effect */}
+                  <motion.div
+                    className="absolute -bottom-1 left-0 h-0.5 bg-gradient-to-r from-red-500 to-yellow-400"
+                    initial={{ width: 0 }}
+                    whileHover={{ width: "100%" }}
+                    transition={{ duration: 0.3 }}
+                  />
+                </motion.a>
+              ))}
           </div>
 
           {/* Mobile Menu Button */}
@@ -184,20 +183,25 @@ const Header = () => {
               }}
             >
               <div className="px-2 pt-2 pb-3 space-y-1">
-                {navItems.map((item, index) => (
-                  <motion.a
-                    key={item}
-                    href={`#${item.toLowerCase().replace(" ", "-")}`}
-                    className="block px-4 py-3 text-white/90 hover:text-yellow-400 hover:bg-white/5 rounded-lg transition-all duration-200 font-medium"
-                    onClick={() => setIsOpen(false)}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.3, delay: index * 0.1 }}
-                    whileHover={{ x: 8 }}
-                  >
-                    {item}
-                  </motion.a>
-                ))}
+                {showLinks &&
+                  navItems.map((item, index) => (
+                    <motion.a
+                      key={item}
+                      href={`#${item.toLowerCase().replace(" ", "-")}`}
+                      className="block px-4 py-3 text-white/90 hover:text-yellow-400 hover:bg-white/5 rounded-lg transition-all duration-200 font-medium"
+                      onClick={() => setIsOpen(false)}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{
+                        duration: 1.2,
+                        delay: 0.12 * index,
+                        ease: [0.4, 0.0, 0.2, 1],
+                      }}
+                      whileHover={{ x: 8 }}
+                    >
+                      {item}
+                    </motion.a>
+                  ))}
               </div>
             </motion.div>
           )}
