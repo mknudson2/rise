@@ -1,10 +1,14 @@
 import React, { useState, useEffect, useRef } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { scrollingWords } from "../../utils/constants";
 
+const FADE_IN = 1200;
+const HOLD = 1500;
+const FADE_OUT = 1200;
+const TOTAL = FADE_IN + HOLD + FADE_OUT;
+
 const ScrollingWords = () => {
-  const [spotlightWord, setSpotlightWord] = useState(null);
-  const [isHighlighted, setIsHighlighted] = useState({}); // Track highlight state per word
+  const [spotlightOverlay, setSpotlightOverlay] = useState(null);
   const containerRef = useRef(null);
 
   // Create multiple rows for more visual interest
@@ -19,20 +23,9 @@ const ScrollingWords = () => {
 
   const wordRows = createWordRows();
 
-  // Create a flat array of all words for spotlight selection
-  const allWordsFlat = wordRows.flatMap((row, rowIndex) =>
-    row.map((word, wordIndex) => ({
-      word,
-      rowIndex,
-      wordIndex,
-      uniqueId: `${rowIndex}-${wordIndex}-${word}`,
-    }))
-  );
-
-  // Enhanced visibility check - more precise detection
+  // Enhanced visibility check - returns array of visible word objects
   const getVisibleWords = () => {
     if (!containerRef.current) return [];
-
     const container = containerRef.current;
     const containerRect = container.getBoundingClientRect();
     const wordElements = container.querySelectorAll("[data-word-id]");
@@ -41,122 +34,228 @@ const ScrollingWords = () => {
     wordElements.forEach((element) => {
       const rect = element.getBoundingClientRect();
       const wordId = element.getAttribute("data-word-id");
-
-      // More precise visibility check - word must be substantially visible
       const isVisible =
         rect.right > containerRect.left + 100 &&
-        rect.left < containerRect.right - 100 &&
-        rect.bottom > containerRect.top &&
-        rect.top < containerRect.bottom;
+        rect.left < containerRect.right - 100;
 
       if (isVisible) {
-        visible.push(wordId);
+        // Parse rowIndex and wordIndex from wordId
+        const [rowIndex, wordIndex, ...wordParts] = wordId.split("-");
+        visible.push({
+          wordId,
+          rowIndex: Number(rowIndex),
+          wordIndex: Number(wordIndex),
+          word: wordParts.join("-"),
+          rect,
+        });
       }
     });
 
     return visible;
   };
 
-  // Simplified timing - no intermediate states to prevent animation restarts
-  const highlightWord = (wordId) => {
-    // Start with highlighted state (will fade in from 0 to 1)
-    setIsHighlighted((prev) => ({ ...prev, [wordId]: "highlighted" }));
+  // Overlay highlight logic
+  const showSpotlightOverlay = (wordObj) => {
+    // Get position relative to container
+    const containerRect = containerRef.current.getBoundingClientRect();
+    const { rect, wordId, word } = wordObj;
+    // Get the DOM node for the highlighted word
+    const el = containerRef.current.querySelector(`[data-word-id="${wordId}"]`);
+    let fontSize = "inherit";
+    let fontFamily = "inherit";
+    let fontWeight = "inherit";
+    let paddingLeft = "0px";
+    let paddingRight = "0px";
+    if (el) {
+      const computed = window.getComputedStyle(el);
+      fontSize = computed.fontSize;
+      fontFamily = computed.fontFamily;
+      fontWeight = computed.fontWeight;
+      paddingLeft = computed.paddingLeft;
+      paddingRight = computed.paddingRight;
+    }
+    setSpotlightOverlay({
+      word,
+      wordId,
+      left: rect.left - containerRect.left,
+      top: rect.top - containerRect.top,
+      width: rect.width,
+      height: rect.height,
+      fontSize,
+      fontFamily,
+      fontWeight,
+      paddingLeft,
+      paddingRight,
+      phase: "fading-in",
+    });
 
-    // After hold period, start fade-out
     setTimeout(() => {
-      setIsHighlighted((prev) => ({ ...prev, [wordId]: "fading-out" }));
-    }, 4200); // 1200ms fade-in + 3000ms hold
+      setSpotlightOverlay((prev) =>
+        prev && prev.wordId === wordId
+          ? { ...prev, phase: "highlighted" }
+          : prev
+      );
+    }, FADE_IN);
 
-    // Clean up after fade-out completes
     setTimeout(() => {
-      setIsHighlighted((prev) => {
-        const newState = { ...prev };
-        delete newState[wordId];
-        return newState;
-      });
-    }, 5400); // 1200ms fade-in + 3000ms hold + 1200ms fade-out
+      setSpotlightOverlay((prev) =>
+        prev && prev.wordId === wordId ? { ...prev, phase: "fading-out" } : prev
+      );
+    }, FADE_IN + HOLD);
+
+    setTimeout(() => {
+      setSpotlightOverlay((prev) =>
+        prev && prev.wordId === wordId ? null : prev
+      );
+    }, TOTAL);
   };
 
-  // Spotlight effect - ONLY highlight visible words on screen
+  // Keep overlay position in sync with scrolling word
   useEffect(() => {
-    const interval = setInterval(() => {
-      const visibleWords = getVisibleWords();
+    if (!spotlightOverlay) return;
 
-      // Only proceed if there are actually visible words
+    let animationFrameId;
+
+    const updateOverlayPosition = () => {
+      const el = containerRef.current.querySelector(
+        `[data-word-id="${spotlightOverlay.wordId}"]`
+      );
+      const containerRect = containerRef.current.getBoundingClientRect();
+      if (el) {
+        const rect = el.getBoundingClientRect();
+        const computed = window.getComputedStyle(el);
+        setSpotlightOverlay((prev) =>
+          prev
+            ? {
+                ...prev,
+                left: rect.left - containerRect.left,
+                top: rect.top - containerRect.top,
+                width: rect.width,
+                height: rect.height,
+                fontSize: computed.fontSize,
+                fontFamily: computed.fontFamily,
+                fontWeight: computed.fontWeight,
+                paddingLeft: computed.paddingLeft,
+                paddingRight: computed.paddingRight,
+              }
+            : prev
+        );
+      }
+      animationFrameId = requestAnimationFrame(updateOverlayPosition);
+    };
+
+    animationFrameId = requestAnimationFrame(updateOverlayPosition);
+
+    return () => {
+      if (animationFrameId) cancelAnimationFrame(animationFrameId);
+    };
+  }, [spotlightOverlay?.wordId]);
+
+  // Spotlight effect - only highlight truly visible word instances
+  useEffect(() => {
+    let isMounted = true;
+
+    const highlightCycle = () => {
+      if (!isMounted) return;
+      const visibleWords = getVisibleWords();
       if (visibleWords.length > 0) {
         const randomIndex = Math.floor(Math.random() * visibleWords.length);
-        const selectedWord = visibleWords[randomIndex];
-        setSpotlightWord(selectedWord);
-        highlightWord(selectedWord);
+        const selected = visibleWords[randomIndex];
+        showSpotlightOverlay(selected);
       }
-    }, 6000); // Extended cycle to 6 seconds to accommodate longer transitions
+      setTimeout(highlightCycle, TOTAL);
+    };
 
-    return () => clearInterval(interval);
-  }, [allWordsFlat]);
+    highlightCycle();
 
-  // Initialize with a visible word only
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  // Initialize with a visible word only (optional, can be removed if highlightCycle is enough)
   useEffect(() => {
     const timer = setTimeout(() => {
       const visibleWords = getVisibleWords();
       if (visibleWords.length > 0) {
         const randomIndex = Math.floor(Math.random() * visibleWords.length);
-        const selectedWord = visibleWords[randomIndex];
-        setSpotlightWord(selectedWord);
-        highlightWord(selectedWord);
+        const selected = visibleWords[randomIndex];
+        showSpotlightOverlay(selected);
       }
     }, 800);
 
     return () => clearTimeout(timer);
   }, []);
 
-  const WordElement = ({ word, rowIndex, wordIndex }) => {
+  const WordElement = React.memo(({ word, rowIndex, wordIndex }) => {
     const uniqueId = `${rowIndex}-${wordIndex}-${word}`;
-    const highlightState = isHighlighted[uniqueId];
-
     return (
       <span
         data-word-id={uniqueId}
         className="inline-block mx-6 sm:mx-8 md:mx-12 text-xl sm:text-2xl md:text-3xl lg:text-4xl select-none relative"
       >
-        {/* Base gray text - more subtle with reduced opacity */}
         <span className="font-light text-gray-500 hover:text-gray-400 block whitespace-nowrap opacity-40">
           {word}
         </span>
-
-        {/* Gradient overlay with proper fade in AND fade out */}
-        <motion.span
-          className="absolute inset-0 top-0 left-0 font-light bg-gradient-to-r from-red-500 to-yellow-400 bg-clip-text text-transparent whitespace-nowrap pointer-events-none"
-          initial={{ opacity: 0 }}
-          animate={{
-            opacity:
-              highlightState === "highlighted"
-                ? 1
-                : highlightState === "fading-out"
-                ? 0
-                : 0,
-          }}
-          transition={{
-            duration: 1.2,
-            ease: [0.4, 0.0, 0.2, 1], // Custom cubic-bezier for smooth fade
-          }}
-        >
-          {word}
-        </motion.span>
       </span>
     );
-  };
+  });
 
   return (
     <section
       ref={containerRef}
       className="relative py-12 sm:py-16 bg-gray-900/20 overflow-hidden"
     >
+      {/* Overlay highlight */}
+      <AnimatePresence>
+        {spotlightOverlay && (
+          <motion.span
+            key={spotlightOverlay.wordId}
+            className="pointer-events-none font-light bg-gradient-to-r from-red-500 to-yellow-400 bg-clip-text text-transparent whitespace-nowrap absolute z-20"
+            style={{
+              left: spotlightOverlay.left,
+              top: spotlightOverlay.top,
+              width: spotlightOverlay.width,
+              height: spotlightOverlay.height,
+              fontSize: spotlightOverlay.fontSize,
+              fontFamily: spotlightOverlay.fontFamily,
+              fontWeight: spotlightOverlay.fontWeight,
+              paddingLeft: spotlightOverlay.paddingLeft,
+              paddingRight: spotlightOverlay.paddingRight,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              pointerEvents: "none",
+            }}
+            initial={{ opacity: 0 }}
+            animate={{
+              opacity:
+                spotlightOverlay.phase === "fading-in"
+                  ? 1
+                  : spotlightOverlay.phase === "highlighted"
+                  ? 1
+                  : spotlightOverlay.phase === "fading-out"
+                  ? 0
+                  : 0,
+            }}
+            transition={{
+              duration:
+                spotlightOverlay.phase === "fading-in" ||
+                spotlightOverlay.phase === "fading-out"
+                  ? 1.2
+                  : 0,
+              ease: [0.4, 0.0, 0.2, 1],
+            }}
+            exit={{ opacity: 0, transition: { duration: 0.2 } }}
+          >
+            {spotlightOverlay.word}
+          </motion.span>
+        )}
+      </AnimatePresence>
+
       {/* Background Effects */}
       <div className="absolute inset-0">
-        {/* Animated gradient background */}
         <div className="absolute inset-0 bg-gradient-to-r from-red-950/10 via-yellow-950/10 to-red-950/10 opacity-50" />
-
-        {/* Floating particles */}
         {Array.from({ length: 8 }, (_, i) => (
           <motion.div
             key={i}
@@ -182,7 +281,6 @@ const ScrollingWords = () => {
 
       {/* Glass morphism container */}
       <div className="relative backdrop-blur-sm bg-gray-900/10 border-y border-gray-800/50">
-        {/* Top Row - Left to Right */}
         <div className="relative overflow-hidden py-4">
           <motion.div
             className="flex whitespace-nowrap"
@@ -193,7 +291,6 @@ const ScrollingWords = () => {
               ease: "linear",
             }}
           >
-            {/* Duplicate for seamless loop */}
             {[...wordRows[0], ...wordRows[0], ...wordRows[0]].map(
               (word, index) => (
                 <WordElement
@@ -206,8 +303,6 @@ const ScrollingWords = () => {
             )}
           </motion.div>
         </div>
-
-        {/* Middle Row - Right to Left (Opposite Direction) */}
         <div className="relative overflow-hidden py-4">
           <motion.div
             className="flex whitespace-nowrap"
@@ -230,8 +325,6 @@ const ScrollingWords = () => {
             )}
           </motion.div>
         </div>
-
-        {/* Bottom Row - Left to Right (Slower) */}
         <div className="relative overflow-hidden py-4">
           <motion.div
             className="flex whitespace-nowrap"
@@ -256,11 +349,8 @@ const ScrollingWords = () => {
         </div>
       </div>
 
-      {/* Fade edges for smooth visual transition */}
       <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-gray-900 to-transparent pointer-events-none z-10" />
       <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-gray-900 to-transparent pointer-events-none z-10" />
-
-      {/* Bottom gradient transition */}
       <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-gray-900/50 to-transparent pointer-events-none" />
     </section>
   );

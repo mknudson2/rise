@@ -75,7 +75,7 @@ const Hero = ({ openContactModal }) => {
           >
             {/* CHANGED: Restructured layout to use flexbox instead of inline-block with absolute positioning */}
             <div className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-light text-gray-200 flex items-center justify-center flex-wrap gap-2">
-              <span className="text-gray-400">Empowering</span>
+              <span className="text-gray-200">Empowering</span>
               <span className="text-yellow-400">•</span>
               {/* CHANGED: From inline-block with absolute positioning to relative flexbox */}
               <div className="relative min-w-[180px] sm:min-w-[200px] flex justify-center">
