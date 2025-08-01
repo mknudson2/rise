@@ -74,11 +74,10 @@ const Hero = ({ openContactModal }) => {
             transition={{ duration: 0.8, delay: 1.0 }}
           >
             {/* CHANGED: Restructured layout to use flexbox instead of inline-block with absolute positioning */}
-            <div className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-light text-gray-200 flex items-center justify-center flex-wrap gap-2">
+            <div className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-light text-gray-200 flex items-center justify-center flex-wrap">
               <span className="text-gray-200">Empowering</span>
-              <span className="text-yellow-400">•</span>
-              {/* CHANGED: From inline-block with absolute positioning to relative flexbox */}
-              <div className="relative min-w-[180px] sm:min-w-[200px] flex justify-center">
+              <span className="text-yellow-400 mx-2">•</span>
+              <div className="relative flex items-center text-left w-[120px] sm:w-[140px] md:w-[160px] lg:w-[180px]">
                 <AnimatePresence mode="wait">
                   <motion.span
                     key={currentWord}
@@ -87,9 +86,10 @@ const Hero = ({ openContactModal }) => {
                     exit={{ opacity: 0, y: -30, filter: "blur(10px)" }}
                     transition={{
                       duration: 0.8,
-                      ease: [0.25, 0.46, 0.45, 0.94], // Custom cubic-bezier for smoother motion
+                      ease: [0.25, 0.46, 0.45, 0.94],
                     }}
-                    className="bg-gradient-to-r from-red-500 to-yellow-400 bg-clip-text text-transparent font-semibold block"
+                    className="bg-gradient-to-r from-red-500 to-yellow-400 bg-clip-text text-transparent font-semibold block w-full text-left"
+                    style={{ minWidth: "0" }} // Ensures no extra space
                   >
                     {words[currentWord]}
                   </motion.span>
