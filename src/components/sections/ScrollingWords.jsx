@@ -54,11 +54,12 @@ const ScrollingWords = () => {
     return visible;
   };
 
-  // Overlay highlight logic
+  // Enhanced overlay highlight logic with proper alignment
   const showSpotlightOverlay = (wordObj) => {
     // Get position relative to container
     const containerRect = containerRef.current.getBoundingClientRect();
     const { rect, wordId, word } = wordObj;
+    
     // Get the DOM node for the highlighted word
     const el = containerRef.current.querySelector(`[data-word-id="${wordId}"]`);
     let fontSize = "inherit";
@@ -66,6 +67,7 @@ const ScrollingWords = () => {
     let fontWeight = "inherit";
     let paddingLeft = "0px";
     let paddingRight = "0px";
+    
     if (el) {
       const computed = window.getComputedStyle(el);
       fontSize = computed.fontSize;
@@ -74,10 +76,12 @@ const ScrollingWords = () => {
       paddingLeft = computed.paddingLeft;
       paddingRight = computed.paddingRight;
     }
+
+    // Position overlay so the word part aligns exactly with the grey word
     setSpotlightOverlay({
       word,
       wordId,
-      left: rect.left - containerRect.left,
+      left: rect.left - containerRect.left, // Keep word in same position
       top: rect.top - containerRect.top,
       width: rect.width,
       height: rect.height,
@@ -124,6 +128,7 @@ const ScrollingWords = () => {
       if (el) {
         const rect = el.getBoundingClientRect();
         const computed = window.getComputedStyle(el);
+        
         setSpotlightOverlay((prev) =>
           prev
             ? {
@@ -173,7 +178,7 @@ const ScrollingWords = () => {
     };
   }, []);
 
-  // Initialize with a visible word only (optional, can be removed if highlightCycle is enough)
+  // Initialize with a visible word only
   useEffect(() => {
     const timer = setTimeout(() => {
       const visibleWords = getVisibleWords();
@@ -189,12 +194,21 @@ const ScrollingWords = () => {
 
   const WordElement = React.memo(({ word, rowIndex, wordIndex }) => {
     const uniqueId = `${rowIndex}-${wordIndex}-${word}`;
+    
+    // Calculate if this word should be dimmed (nearby the highlighted word)
+    const shouldDim = spotlightOverlay && spotlightOverlay.wordId !== uniqueId;
+    
     return (
       <span
         data-word-id={uniqueId}
         className="inline-block mx-6 sm:mx-8 md:mx-12 text-xl sm:text-2xl md:text-3xl lg:text-4xl select-none relative"
       >
-        <span className="font-light text-gray-500 hover:text-gray-400 block whitespace-nowrap opacity-40">
+        <span 
+          className={`font-light text-gray-500 hover:text-gray-400 block whitespace-nowrap transition-opacity duration-1000 ease-out`}
+          style={{
+            opacity: shouldDim ? 0.15 : 0.4
+          }}
+        >
           {word}
         </span>
       </span>
@@ -206,50 +220,131 @@ const ScrollingWords = () => {
       ref={containerRef}
       className="relative py-12 sm:py-16 bg-gray-900/20 overflow-hidden"
     >
-      {/* Overlay highlight */}
+      {/* Enhanced Overlay highlight with premium separation effects */}
       <AnimatePresence>
         {spotlightOverlay && (
-          <motion.span
-            key={spotlightOverlay.wordId}
-            className="pointer-events-none font-light bg-gradient-to-r from-red-500 to-yellow-400 bg-clip-text text-transparent whitespace-nowrap absolute z-20"
-            style={{
-              left: spotlightOverlay.left,
-              top: spotlightOverlay.top,
-              width: spotlightOverlay.width,
-              height: spotlightOverlay.height,
-              fontSize: spotlightOverlay.fontSize,
-              fontFamily: spotlightOverlay.fontFamily,
-              fontWeight: spotlightOverlay.fontWeight,
-              paddingLeft: spotlightOverlay.paddingLeft,
-              paddingRight: spotlightOverlay.paddingRight,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              pointerEvents: "none",
-            }}
-            initial={{ opacity: 0 }}
-            animate={{
-              opacity:
-                spotlightOverlay.phase === "fading-in"
-                  ? 1
-                  : spotlightOverlay.phase === "highlighted"
-                  ? 1
-                  : spotlightOverlay.phase === "fading-out"
-                  ? 0
-                  : 0,
-            }}
-            transition={{
-              duration:
-                spotlightOverlay.phase === "fading-in" ||
-                spotlightOverlay.phase === "fading-out"
-                  ? 1.2
-                  : 0,
-              ease: [0.4, 0.0, 0.2, 1],
-            }}
-            exit={{ opacity: 0, transition: { duration: 0.2 } }}
-          >
-            {spotlightOverlay.word}
-          </motion.span>
+          <>
+            {/* Subtle backdrop for premium separation */}
+            <motion.div
+              key={`backdrop-${spotlightOverlay.wordId}`}
+              className="pointer-events-none absolute z-10"
+              style={{
+                left: spotlightOverlay.left - (parseFloat(spotlightOverlay.fontSize) * 3.5),
+                top: spotlightOverlay.top - (parseFloat(spotlightOverlay.fontSize) * 0.2),
+                width: parseFloat(spotlightOverlay.fontSize) * 8,
+                height: parseFloat(spotlightOverlay.fontSize) * 1.4,
+                background: "rgba(0, 0, 0, 0.15)",
+                backdropFilter: "blur(12px)",
+                borderRadius: "12px",
+              }}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{
+                opacity:
+                  spotlightOverlay.phase === "fading-in"
+                    ? 1
+                    : spotlightOverlay.phase === "highlighted"
+                    ? 1
+                    : spotlightOverlay.phase === "fading-out"
+                    ? 0
+                    : 0,
+                scale: 1,
+              }}
+              transition={{
+                duration:
+                  spotlightOverlay.phase === "fading-in" ||
+                  spotlightOverlay.phase === "fading-out"
+                    ? 1.2
+                    : 0,
+                ease: [0.4, 0.0, 0.2, 1],
+              }}
+              exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
+            />
+
+            {/* "RISE is" positioned with perfect spacing and subtle glow */}
+            <motion.span
+              key={`rise-${spotlightOverlay.wordId}`}
+              className="pointer-events-none font-light bg-gradient-to-r from-red-500 to-yellow-400 bg-clip-text text-transparent whitespace-nowrap absolute z-20"
+              style={{
+                left: spotlightOverlay.left - (parseFloat(spotlightOverlay.fontSize) * 3.2),
+                top: spotlightOverlay.top,
+                height: spotlightOverlay.height,
+                fontSize: spotlightOverlay.fontSize,
+                fontFamily: spotlightOverlay.fontFamily,
+                fontWeight: spotlightOverlay.fontWeight,
+                display: "flex",
+                alignItems: "center",
+                textShadow: "0 0 20px rgba(239, 68, 68, 0.4), 0 0 40px rgba(239, 68, 68, 0.2)",
+                filter: "drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3))",
+              }}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{
+                opacity:
+                  spotlightOverlay.phase === "fading-in"
+                    ? 1
+                    : spotlightOverlay.phase === "highlighted"
+                    ? 1
+                    : spotlightOverlay.phase === "fading-out"
+                    ? 0
+                    : 0,
+                x: 0,
+              }}
+              transition={{
+                duration:
+                  spotlightOverlay.phase === "fading-in" ||
+                  spotlightOverlay.phase === "fading-out"
+                    ? 1.2
+                    : 0,
+                ease: [0.4, 0.0, 0.2, 1],
+              }}
+              exit={{ opacity: 0, x: 20, transition: { duration: 0.2 } }}
+            >
+              RISE is
+            </motion.span>
+
+            {/* The highlighted word - perfectly aligned with subtle glow */}
+            <motion.span
+              key={`word-${spotlightOverlay.wordId}`}
+              className="pointer-events-none font-light bg-gradient-to-r from-red-500 to-yellow-400 bg-clip-text text-transparent whitespace-nowrap absolute z-20"
+              style={{
+                left: spotlightOverlay.left,
+                top: spotlightOverlay.top,
+                width: spotlightOverlay.width,
+                height: spotlightOverlay.height,
+                fontSize: spotlightOverlay.fontSize,
+                fontFamily: spotlightOverlay.fontFamily,
+                fontWeight: spotlightOverlay.fontWeight,
+                paddingLeft: spotlightOverlay.paddingLeft,
+                paddingRight: spotlightOverlay.paddingRight,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                textShadow: "0 0 20px rgba(239, 68, 68, 0.4), 0 0 40px rgba(239, 68, 68, 0.2)",
+                filter: "drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3))",
+              }}
+              initial={{ opacity: 0 }}
+              animate={{
+                opacity:
+                  spotlightOverlay.phase === "fading-in"
+                    ? 1
+                    : spotlightOverlay.phase === "highlighted"
+                    ? 1
+                    : spotlightOverlay.phase === "fading-out"
+                    ? 0
+                    : 0,
+              }}
+              transition={{
+                duration:
+                  spotlightOverlay.phase === "fading-in" ||
+                  spotlightOverlay.phase === "fading-out"
+                    ? 1.2
+                    : 0,
+                ease: [0.4, 0.0, 0.2, 1],
+              }}
+              exit={{ opacity: 0, transition: { duration: 0.2 } }}
+            >
+              {spotlightOverlay.word}
+            </motion.span>
+          </>
         )}
       </AnimatePresence>
 
