@@ -10,13 +10,23 @@ const Header = () => {
     <nav className="fixed top-0 w-full z-50 bg-gray-900/90 backdrop-blur-sm border-b border-gray-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
+          {/* Logo + RISE Text */}
           <motion.div
-            className="text-2xl font-bold bg-gradient-to-r from-red-500 to-yellow-400 bg-clip-text text-transparent"
+            className="flex items-center space-x-3"
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
           >
-            RISE
+            {/* Logo */}
+            <img
+              src="/assets/logo/logo-dark.png"
+              alt="RISE logo - Phoenix rising"
+              className="h-8 w-8 object-contain"
+            />
+            {/* RISE Text */}
+            <span className="text-2xl font-bold bg-gradient-to-r from-red-500 to-yellow-400 bg-clip-text text-transparent">
+              RISE
+            </span>
           </motion.div>
 
           {/* Desktop Menu */}

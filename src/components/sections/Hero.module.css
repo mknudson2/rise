@@ -1,0 +1,239 @@
+/* Hero Animations - Phoenix Rising Concept */
+
+/* Animated gradient background */
+@keyframes gradientShift {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+/* Rising particles animation */
+@keyframes particleRise {
+  0% {
+    transform: translateY(100vh) scale(0) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+    transform: translateY(90vh) scale(1) rotate(45deg);
+  }
+  90% {
+    opacity: 1;
+    transform: translateY(10vh) scale(1) rotate(315deg);
+  }
+  100% {
+    transform: translateY(-10vh) scale(0) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+/* Floating animation for stats cards */
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+/* Pulse glow effect */
+@keyframes pulseGlow {
+  0%,
+  100% {
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(239, 68, 68, 0.6);
+  }
+}
+
+/* Glass card styling */
+.glassCard {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+}
+
+.glassCard:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  box-shadow: 0 12px 40px rgba(239, 68, 68, 0.2);
+  transform: translateY(-5px) scale(1.02);
+}
+
+/* Animated background gradient */
+.animatedBackground {
+  background: linear-gradient(-45deg, #ef4444, #f97316, #facc15, #ef4444);
+  background-size: 400% 400%;
+  animation: gradientShift 12s ease infinite;
+}
+
+/* Particle styling */
+.particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: linear-gradient(45deg, #ef4444, #facc15);
+  border-radius: 50%;
+  opacity: 0.6;
+}
+
+/* Text transition effects */
+.wordTransition {
+  transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Smooth blur transition for text changes */
+@keyframes smoothTextChange {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+    filter: blur(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0px);
+  }
+}
+
+/* Enhanced text glow effect */
+.textGlow {
+  text-shadow: 0 0 40px rgba(239, 68, 68, 0.3), 0 0 80px rgba(239, 68, 68, 0.1);
+}
+
+/* Seamless gradient transition */
+.gradientTransition {
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(8, 8, 8, 0.3) 30%,
+    rgba(8, 8, 8, 0.7) 70%,
+    #080808 100%
+  );
+}
+
+/* Button hover effects */
+.primaryButton {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.primaryButton:hover {
+  box-shadow: 0 20px 40px rgba(239, 68, 68, 0.3);
+  transform: translateY(-2px);
+}
+
+.primaryButton::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  transition: left 0.5s;
+}
+
+.primaryButton:hover::before {
+  left: 100%;
+}
+
+/* Secondary button effects */
+.secondaryButton {
+  backdrop-filter: blur(20px);
+  transition: all 0.3s ease;
+}
+
+.secondaryButton:hover {
+  box-shadow: 0 0 30px rgba(250, 204, 21, 0.3);
+  transform: translateY(-2px);
+}
+
+/* Seamless gradient transition */
+.gradientTransition {
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(8, 8, 8, 0.3) 30%,
+    rgba(8, 8, 8, 0.7) 70%,
+    #080808 100%
+  );
+}
+
+/* Mobile optimizations */
+@media (max-width: 640px) {
+  .glassCard {
+    backdrop-filter: blur(10px);
+  }
+
+  /* Reduce particle animation intensity on mobile */
+  .particle {
+    width: 2px;
+    height: 2px;
+    opacity: 0.4;
+  }
+
+  /* Simpler animations on mobile for performance */
+  @keyframes particleRise {
+    0% {
+      transform: translateY(100vh);
+      opacity: 0;
+    }
+    50% {
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(-10vh);
+      opacity: 0;
+    }
+  }
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  .animatedBackground {
+    animation: none;
+    background: linear-gradient(-45deg, #ef4444, #f97316);
+  }
+
+  .particle {
+    display: none;
+  }
+
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .glassCard {
+    background: rgba(0, 0, 0, 0.8);
+    border: 2px solid #fff;
+  }
+}
+
+/* Print styles */
+@media print {
+  .particle,
+  .animatedBackground {
+    display: none;
+  }
+}
