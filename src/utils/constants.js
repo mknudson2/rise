@@ -202,15 +202,16 @@ export const faqs = [
   {
     question: "Do you accept insurance?",
     answer:
-      "Insurance coverage varies significantly, and many insurance companies are still catching up to innovative rehabilitation approaches. We provide detailed documentation that you can submit to your insurance company for potential reimbursement. We also offer payment plans and financing options to make our programs accessible. During your consultation, we'll discuss all financial options and help you navigate insurance possibilities. Don't let insurance concerns prevent you from exploring this life-changing opportunity.",
+      "We accept private pay only. We do not accept any type of insurance at this time.",
   },
 ];
 
 // Navigation menu items
 export const navItems = [
-  "About",
+  // "About",
   "Programs",
   "Success Stories",
+  "RISE Method",
   "Team",
   "FAQ",
   "Contact",

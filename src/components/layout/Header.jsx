@@ -13,7 +13,7 @@ const Header = () => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
       setScrollY(currentScrollY);
-      
+
       // Consider "scrolled" after moving past hero section (roughly 80vh)
       const heroHeight = window.innerHeight * 0.8;
       setIsScrolled(currentScrollY > heroHeight);
@@ -21,7 +21,7 @@ const Header = () => {
 
     // Add scroll listener
     window.addEventListener("scroll", handleScroll, { passive: true });
-    
+
     // Initial check
     handleScroll();
 
@@ -31,11 +31,11 @@ const Header = () => {
   // Calculate dynamic opacity based on scroll position
   const getNavbarOpacity = () => {
     if (isScrolled) return 1; // Fully opaque over content sections
-    
+
     // Gradual transition in hero area (0 to 80vh)
     const heroHeight = window.innerHeight * 0.8;
     const scrollProgress = Math.min(scrollY / (heroHeight * 0.3), 1); // Start transition at 30% of hero
-    return 0.1 + (scrollProgress * 0.9); // Range from 0.1 to 1.0
+    return 0.1 + scrollProgress * 0.9; // Range from 0.1 to 1.0
   };
 
   // Get background styles based on scroll state
@@ -51,9 +51,13 @@ const Header = () => {
     } else {
       // Nearly transparent over hero with subtle effects
       return {
-        background: `rgba(17, 24, 39, ${0.1 + (scrollY / (window.innerHeight * 0.8)) * 0.4})`,
+        background: `rgba(17, 24, 39, ${
+          0.1 + (scrollY / (window.innerHeight * 0.8)) * 0.4
+        })`,
         backdropFilter: "blur(12px)",
-        borderBottom: `1px solid rgba(107, 114, 128, ${0.1 + (scrollY / (window.innerHeight * 0.8)) * 0.2})`,
+        borderBottom: `1px solid rgba(107, 114, 128, ${
+          0.1 + (scrollY / (window.innerHeight * 0.8)) * 0.2
+        })`,
         boxShadow: "none",
       };
     }
@@ -70,13 +74,13 @@ const Header = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo + RISE Text */}
-          <motion.div
-            className="flex items-center space-x-3"
+          <motion.a
+            href="#"
+            className="flex items-center space-x-3 cursor-pointer"
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
           >
-            {/* Logo */}
             <motion.img
               src="/assets/logo/logo-dark.png"
               alt="RISE logo - Phoenix rising"
@@ -84,15 +88,14 @@ const Header = () => {
               whileHover={{ scale: 1.1, rotate: 5 }}
               transition={{ duration: 0.2 }}
             />
-            {/* RISE Text */}
-            <motion.span 
+            <motion.span
               className="text-2xl font-bold bg-gradient-to-r from-red-500 to-yellow-400 bg-clip-text text-transparent"
               whileHover={{ scale: 1.05 }}
               transition={{ duration: 0.2 }}
             >
               RISE
             </motion.span>
-          </motion.div>
+          </motion.a>
 
           {/* Desktop Menu */}
           <div className="hidden md:flex space-x-8">
@@ -101,8 +104,8 @@ const Header = () => {
                 key={item}
                 href={`#${item.toLowerCase().replace(" ", "-")}`}
                 className={`relative font-medium transition-all duration-300 ${
-                  isScrolled 
-                    ? "text-white hover:text-yellow-400" 
+                  isScrolled
+                    ? "text-white hover:text-yellow-400"
                     : "text-white/90 hover:text-yellow-400"
                 }`}
                 initial={{ opacity: 0, y: -10 }}
@@ -125,8 +128,8 @@ const Header = () => {
           {/* Mobile Menu Button */}
           <motion.button
             className={`md:hidden transition-colors duration-300 p-2 rounded-lg ${
-              isScrolled 
-                ? "text-white hover:bg-gray-800" 
+              isScrolled
+                ? "text-white hover:bg-gray-800"
                 : "text-white/90 hover:bg-white/10"
             }`}
             onClick={() => setIsOpen(!isOpen)}
@@ -172,12 +175,12 @@ const Header = () => {
               transition={{ duration: 0.3, ease: [0.4, 0.0, 0.2, 1] }}
               className="md:hidden overflow-hidden"
               style={{
-                background: isScrolled 
-                  ? "rgba(17, 24, 39, 0.98)" 
+                background: isScrolled
+                  ? "rgba(17, 24, 39, 0.98)"
                   : "rgba(17, 24, 39, 0.95)",
                 backdropFilter: "blur(20px)",
                 borderTop: "1px solid rgba(107, 114, 128, 0.2)",
-                marginTop: "1px"
+                marginTop: "1px",
               }}
             >
               <div className="px-2 pt-2 pb-3 space-y-1">
