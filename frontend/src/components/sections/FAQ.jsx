@@ -2,10 +2,14 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, Search, X } from "lucide-react";
 import { faqs } from "../../utils/constants";
+import { useContent } from "../../hooks/useContent";
 
 const FAQ = () => {
+  const { content, loading } = useContent();
   const [openFAQ, setOpenFAQ] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
+
+  const faqs = content?.faq || [];
 
   // Filter FAQs based on search term
   const filteredFaqs = faqs.filter((faq) => {

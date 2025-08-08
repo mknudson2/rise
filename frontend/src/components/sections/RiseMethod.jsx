@@ -1,33 +1,69 @@
+// frontend/src/components/sections/RiseMethod.jsx - FIXED: Now uses dynamic content
 import React from "react";
 import { motion } from "framer-motion";
-import { Zap, Users, Award, Target, Heart, Brain } from "lucide-react";
+import { Zap, Heart, Brain } from "lucide-react";
+import { useContent } from "../../hooks/useContent"; // ADD THIS IMPORT
 
 const RiseMethod = ({ openContactModal }) => {
-  const methods = [
+  // ADD THIS: Use dynamic content hook
+  const { content, loading } = useContent();
+
+  // REMOVE THE OLD HARDCODED METHODS ARRAY AND REPLACE WITH DYNAMIC DATA
+
+  // Icon mapping for the three methods
+  const iconMap = {
+    0: Zap, // First method - High-intensity Bootcamp
+    1: Heart, // Second method - Personalized Training
+    2: Brain, // Third method - Evidence-based with Grit
+  };
+
+  // Gradient mapping for the three methods
+  const gradientMap = {
+    0: "from-red-500 to-orange-400",
+    1: "from-orange-400 to-yellow-400",
+    2: "from-yellow-400 to-red-500",
+  };
+
+  // ADD THIS: Loading state
+  if (loading) {
+    return (
+      <section
+        id="rise-method"
+        className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-900/20"
+      >
+        <div className="max-w-7xl mx-auto text-center">
+          <div className="text-gray-300">Loading RISE Method...</div>
+        </div>
+      </section>
+    );
+  }
+
+  // ADD THIS: Get dynamic data with fallbacks
+  const riseMethodData = content?.riseMethod || {};
+  const methods = riseMethodData.methods || [
+    // Fallback data if API fails
     {
-      icon: Zap,
       title: "High-intensity Bootcamp",
       content:
         "The biggest obstacles you face are the ones you've placed on yourself. Let us help you tear them down so we can build you up to reclaim your life",
-      gradient: "from-red-500 to-orange-400",
-      delay: 0.2,
     },
     {
-      icon: Heart,
       title: "Personalized Training and Support",
       content:
         "We review, assess, and interview all RISE clients (and family members) to ensure we make the most out of every bootcamp. You and your goals are our biggest priority.",
-      gradient: "from-orange-400 to-yellow-400",
-      delay: 0.4,
     },
     {
-      icon: Brain,
       title: "Evidence-based with Grit Embraced",
       content:
         "Our methods were meticulously constructed to empower you in every possible way. We set you up for success before the bootcamp begins and provide support long after the bootcamp ends.",
-      gradient: "from-yellow-400 to-red-500",
-      delay: 0.6,
     },
+  ];
+
+  const stats = riseMethodData.stats || [
+    // Fallback data if API fails
+    { label: "Intensive Bootcamp Duration", value: "3-5 Days" },
+    { label: "Evidence-Based Protocols", value: "100%" },
+    { label: "Ongoing Support", value: "Lifetime" },
   ];
 
   return (
@@ -36,7 +72,7 @@ const RiseMethod = ({ openContactModal }) => {
       className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-900/20"
     >
       <div className="max-w-7xl mx-auto">
-        {/* Section Header */}
+        {/* Section Header - Now Dynamic */}
         <motion.div
           className="text-center mb-16"
           initial={{ opacity: 0, y: 20 }}
@@ -45,28 +81,33 @@ const RiseMethod = ({ openContactModal }) => {
           viewport={{ once: true }}
         >
           <h2 className="text-4xl sm:text-5xl font-bold mb-6">
-            The{" "}
+            {/* CHANGED: Now uses dynamic title */}
+            {riseMethodData.title || "The"}{" "}
             <span className="bg-gradient-to-r from-red-500 to-yellow-400 bg-clip-text text-transparent">
               RISE Method
             </span>
           </h2>
           <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-            Three pillars that make our approach to recovery uniquely effective
-            and transformational
+            {/* CHANGED: Now uses dynamic subtitle */}
+            {riseMethodData.subtitle ||
+              "Three pillars that make our approach to recovery uniquely effective and transformational"}
           </p>
         </motion.div>
 
-        {/* Methods Grid */}
+        {/* Methods Grid - Now Dynamic */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
+          {/* CHANGED: Now uses dynamic methods instead of hardcoded array */}
           {methods.map((method, index) => {
-            const IconComponent = method.icon;
+            const IconComponent = iconMap[index] || Zap;
+            const gradient = gradientMap[index] || "from-red-500 to-orange-400";
+
             return (
               <motion.div
                 key={index}
                 className="group relative"
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: method.delay }}
+                transition={{ duration: 0.8, delay: index * 0.2 }}
                 viewport={{ once: true }}
               >
                 {/* Background Card */}
@@ -77,7 +118,7 @@ const RiseMethod = ({ openContactModal }) => {
                 >
                   {/* Gradient Background on Hover */}
                   <div
-                    className={`absolute inset-0 bg-gradient-to-br ${method.gradient} opacity-0 
+                    className={`absolute inset-0 bg-gradient-to-br ${gradient} opacity-0 
                                   group-hover:opacity-5 transition-all duration-500`}
                   ></div>
 
@@ -85,7 +126,7 @@ const RiseMethod = ({ openContactModal }) => {
                   <div className="relative z-10">
                     {/* Icon */}
                     <div
-                      className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${method.gradient} 
+                      className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${gradient} 
                                     p-4 mb-6 group-hover:scale-110 transition-transform duration-300`}
                     >
                       <IconComponent className="w-full h-full text-white" />
@@ -97,18 +138,20 @@ const RiseMethod = ({ openContactModal }) => {
                                  group-hover:bg-gradient-to-r group-hover:from-red-500 group-hover:to-yellow-400 
                                  group-hover:bg-clip-text transition-all duration-300"
                     >
+                      {/* CHANGED: Now uses dynamic method title */}
                       {method.title}
                     </h3>
 
                     {/* Content */}
                     <p className="text-gray-300 leading-relaxed text-lg">
+                      {/* CHANGED: Now uses dynamic method content */}
                       {method.content}
                     </p>
                   </div>
 
                   {/* Decorative Element */}
                   <div
-                    className={`absolute -bottom-2 -right-2 w-24 h-24 bg-gradient-to-br ${method.gradient} 
+                    className={`absolute -bottom-2 -right-2 w-24 h-24 bg-gradient-to-br ${gradient} 
                                   rounded-full opacity-5 group-hover:opacity-10 group-hover:scale-125 
                                   transition-all duration-500`}
                   ></div>
@@ -118,7 +161,7 @@ const RiseMethod = ({ openContactModal }) => {
           })}
         </div>
 
-        {/* Stats/Features Row */}
+        {/* Stats/Features Row - Now Dynamic */}
         <motion.div
           className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16"
           initial={{ opacity: 0, y: 20 }}
@@ -126,27 +169,18 @@ const RiseMethod = ({ openContactModal }) => {
           transition={{ duration: 0.8, delay: 0.8 }}
           viewport={{ once: true }}
         >
-          <div className="text-center">
-            <div className="text-4xl font-bold bg-gradient-to-r from-red-500 to-yellow-400 bg-clip-text text-transparent mb-2">
-              3-5 Days
+          {/* CHANGED: Now uses dynamic stats instead of hardcoded */}
+          {stats.map((stat, index) => (
+            <div key={index} className="text-center">
+              <div className="text-4xl font-bold bg-gradient-to-r from-red-500 to-yellow-400 bg-clip-text text-transparent mb-2">
+                {stat.value}
+              </div>
+              <p className="text-gray-300">{stat.label}</p>
             </div>
-            <p className="text-gray-300">Intensive Bootcamp Duration</p>
-          </div>
-          <div className="text-center">
-            <div className="text-4xl font-bold bg-gradient-to-r from-red-500 to-yellow-400 bg-clip-text text-transparent mb-2">
-              100%
-            </div>
-            <p className="text-gray-300">Evidence-Based Protocols</p>
-          </div>
-          <div className="text-center">
-            <div className="text-4xl font-bold bg-gradient-to-r from-red-500 to-yellow-400 bg-clip-text text-transparent mb-2">
-              Lifetime
-            </div>
-            <p className="text-gray-300">Ongoing Support</p>
-          </div>
+          ))}
         </motion.div>
 
-        {/* Call to Action */}
+        {/* Call to Action - Unchanged */}
         <motion.div
           className="text-center"
           initial={{ opacity: 0, y: 20 }}

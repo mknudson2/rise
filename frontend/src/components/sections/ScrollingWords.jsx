@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { scrollingWords } from "../../utils/constants";
+import { useContent } from "../../hooks/useContent";
 
 const FADE_IN = 1200;
 const HOLD = 1500;
@@ -10,6 +11,44 @@ const TOTAL = FADE_IN + HOLD + FADE_OUT;
 const ScrollingWords = () => {
   const [spotlightOverlay, setSpotlightOverlay] = useState(null);
   const containerRef = useRef(null);
+  const { content } = useContent();
+
+  const defaultWords = [
+    "Empowering",
+    "Invigorating",
+    "Freedom",
+    "Groundbreaking",
+    "Inspiring",
+    "Life-Changing",
+    "Unmatched",
+    "Your Spark",
+    "Evidence-Based",
+    "Bold",
+    "Proven",
+    "Effective",
+    "Cutting-Edge",
+    "A Fresh Start",
+    "Strength",
+    "Personalized",
+    "Intuitive",
+    "Accessible",
+    "Reliable",
+    "Authentic",
+    "Transparent",
+    "Limitless",
+    "Unstoppable",
+    "Transformational",
+    "Your Reason",
+    "Unconventional",
+    "One-of-a-kind",
+    "Creative",
+    "Essential",
+    "Priceless",
+    "World-class",
+    "Your 2nd Chance",
+  ];
+
+  const scrollingWords = content?.scrollingWords || defaultWords;
 
   // Create multiple rows for more visual interest
   const createWordRows = () => {
@@ -59,7 +98,7 @@ const ScrollingWords = () => {
     // Get position relative to container
     const containerRect = containerRef.current.getBoundingClientRect();
     const { rect, wordId, word } = wordObj;
-    
+
     // Get the DOM node for the highlighted word
     const el = containerRef.current.querySelector(`[data-word-id="${wordId}"]`);
     let fontSize = "inherit";
@@ -67,7 +106,7 @@ const ScrollingWords = () => {
     let fontWeight = "inherit";
     let paddingLeft = "0px";
     let paddingRight = "0px";
-    
+
     if (el) {
       const computed = window.getComputedStyle(el);
       fontSize = computed.fontSize;
@@ -128,7 +167,7 @@ const ScrollingWords = () => {
       if (el) {
         const rect = el.getBoundingClientRect();
         const computed = window.getComputedStyle(el);
-        
+
         setSpotlightOverlay((prev) =>
           prev
             ? {
@@ -194,19 +233,19 @@ const ScrollingWords = () => {
 
   const WordElement = React.memo(({ word, rowIndex, wordIndex }) => {
     const uniqueId = `${rowIndex}-${wordIndex}-${word}`;
-    
+
     // Calculate if this word should be dimmed (nearby the highlighted word)
     const shouldDim = spotlightOverlay && spotlightOverlay.wordId !== uniqueId;
-    
+
     return (
       <span
         data-word-id={uniqueId}
         className="inline-block mx-6 sm:mx-8 md:mx-12 text-xl sm:text-2xl md:text-3xl lg:text-4xl select-none relative"
       >
-        <span 
+        <span
           className={`font-light text-gray-500 hover:text-gray-400 block whitespace-nowrap transition-opacity duration-1000 ease-out`}
           style={{
-            opacity: shouldDim ? 0.15 : 0.4
+            opacity: shouldDim ? 0.15 : 0.4,
           }}
         >
           {word}
@@ -229,8 +268,12 @@ const ScrollingWords = () => {
               key={`backdrop-${spotlightOverlay.wordId}`}
               className="pointer-events-none absolute z-10"
               style={{
-                left: spotlightOverlay.left - (parseFloat(spotlightOverlay.fontSize) * 3.5),
-                top: spotlightOverlay.top - (parseFloat(spotlightOverlay.fontSize) * 0.2),
+                left:
+                  spotlightOverlay.left -
+                  parseFloat(spotlightOverlay.fontSize) * 3.5,
+                top:
+                  spotlightOverlay.top -
+                  parseFloat(spotlightOverlay.fontSize) * 0.2,
                 width: parseFloat(spotlightOverlay.fontSize) * 8,
                 height: parseFloat(spotlightOverlay.fontSize) * 1.4,
                 background: "rgba(0, 0, 0, 0.15)",
@@ -265,7 +308,9 @@ const ScrollingWords = () => {
               key={`rise-${spotlightOverlay.wordId}`}
               className="pointer-events-none font-light bg-gradient-to-r from-red-500 to-yellow-400 bg-clip-text text-transparent whitespace-nowrap absolute z-20"
               style={{
-                left: spotlightOverlay.left - (parseFloat(spotlightOverlay.fontSize) * 3.2),
+                left:
+                  spotlightOverlay.left -
+                  parseFloat(spotlightOverlay.fontSize) * 3.2,
                 top: spotlightOverlay.top,
                 height: spotlightOverlay.height,
                 fontSize: spotlightOverlay.fontSize,
@@ -273,7 +318,8 @@ const ScrollingWords = () => {
                 fontWeight: spotlightOverlay.fontWeight,
                 display: "flex",
                 alignItems: "center",
-                textShadow: "0 0 20px rgba(239, 68, 68, 0.4), 0 0 40px rgba(239, 68, 68, 0.2)",
+                textShadow:
+                  "0 0 20px rgba(239, 68, 68, 0.4), 0 0 40px rgba(239, 68, 68, 0.2)",
                 filter: "drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3))",
               }}
               initial={{ opacity: 0, x: 20 }}
@@ -318,7 +364,8 @@ const ScrollingWords = () => {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                textShadow: "0 0 20px rgba(239, 68, 68, 0.4), 0 0 40px rgba(239, 68, 68, 0.2)",
+                textShadow:
+                  "0 0 20px rgba(239, 68, 68, 0.4), 0 0 40px rgba(239, 68, 68, 0.2)",
                 filter: "drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3))",
               }}
               initial={{ opacity: 0 }}

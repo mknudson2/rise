@@ -1,17 +1,29 @@
 import React, { useRef, useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { testimonials } from "../../utils/constants";
+import { useContent } from "../../hooks/useContent"; // Add this import
 import { getTypeColor, getTypeIcon } from "../../utils/formHelpers";
 import { useTestimonials } from "../../hooks/useTestimonials";
 import Button from "../ui/Button";
 
 const Testimonials = ({ openContactModal }) => {
+  const { content, loading } = useContent(); // Add this hook
+
+  // Use dynamic testimonials from API
+  const testimonials = content?.testimonials || [];
+
   const { currentTestimonial, setCurrentTestimonial } =
     useTestimonials(testimonials);
   const scrollContainerRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
   const [scrollLeft, setScrollLeft] = useState(0);
+
+  // Reset current testimonial if testimonials change
+  useEffect(() => {
+    if (testimonials.length > 0 && currentTestimonial >= testimonials.length) {
+      setCurrentTestimonial(0);
+    }
+  }, [testimonials.length, currentTestimonial, setCurrentTestimonial]);
 
   // Drag to scroll functionality
   const handleMouseDown = (e) => {
@@ -34,7 +46,7 @@ const Testimonials = ({ openContactModal }) => {
     if (!isDragging) return;
     e.preventDefault();
     const x = e.pageX - scrollContainerRef.current.offsetLeft;
-    const walk = (x - startX) * 2; // Multiply by 2 for faster scrolling
+    const walk = (x - startX) * 2;
     scrollContainerRef.current.scrollLeft = scrollLeft - walk;
   };
 
@@ -46,11 +58,43 @@ const Testimonials = ({ openContactModal }) => {
     }
   };
 
-  // Add global mouse up listener
   useEffect(() => {
     document.addEventListener("mouseup", handleMouseUp);
     return () => document.removeEventListener("mouseup", handleMouseUp);
   }, []);
+
+  if (loading) {
+    return (
+      <section
+        id="success-stories"
+        className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-900/30"
+      >
+        <div className="max-w-7xl mx-auto text-center">
+          <div className="text-gray-300">Loading testimonials...</div>
+        </div>
+      </section>
+    );
+  }
+
+  // Don't render if no testimonials
+  if (testimonials.length === 0) {
+    return (
+      <section
+        id="success-stories"
+        className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-900/30"
+      >
+        <div className="max-w-7xl mx-auto text-center">
+          <h2 className="text-4xl md:text-5xl font-bold mb-8">
+            Success{" "}
+            <span className="bg-gradient-to-r from-red-500 to-yellow-400 bg-clip-text text-transparent">
+              Stories
+            </span>
+          </h2>
+          <p className="text-gray-400">No testimonials available yet.</p>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section
@@ -128,9 +172,8 @@ const Testimonials = ({ openContactModal }) => {
           </AnimatePresence>
         </div>
 
-        {/* Horizontal Scrolling Cards - Fixed structure to prevent cutoff */}
+        {/* Horizontal Scrolling Cards */}
         <div className="relative py-8 overflow-y-visible">
-          {/* Outer container allows vertical overflow */}
           <div className="overflow-visible pt-4 pb-8">
             <motion.div
               ref={scrollContainerRef}
@@ -145,7 +188,7 @@ const Testimonials = ({ openContactModal }) => {
             >
               {testimonials.map((testimonial, index) => (
                 <motion.div
-                  key={index}
+                  key={testimonial.id || index}
                   className="flex-shrink-0 w-80 bg-gray-900/50 p-6 rounded-2xl border border-gray-800 hover:border-gray-600 transition-all duration-300 cursor-pointer select-none mt-4"
                   style={{ scrollSnapAlign: "start" }}
                   onClick={() => !isDragging && setCurrentTestimonial(index)}

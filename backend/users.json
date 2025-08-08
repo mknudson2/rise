@@ -1,0 +1,22 @@
+[
+  {
+    "id": 1,
+    "email": "michaelknudsonphd@gmail.com",
+    "password": "$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewdBedXHBrNaKj6y",
+    "role": "super",
+    "name": "Michael Knudson",
+    "isActive": true,
+    "createdAt": "2025-08-08T16:40:29.597Z",
+    "lastLogin": "2025-08-08T18:00:35.313Z"
+  },
+  {
+    "id": 2,
+    "email": "knudson.mike@gmail.com",
+    "password": "$2a$12$DkHvEBNQJUFs0DCt8Xcv6eFMOtqo.ela7FwTauIearwgnKMaoaCZ6",
+    "name": "Testy McTesterson",
+    "role": "admin",
+    "isActive": true,
+    "createdAt": "2025-08-08T16:42:07.011Z",
+    "lastLogin": "2025-08-08T18:31:42.256Z"
+  }
+]

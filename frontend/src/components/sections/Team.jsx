@@ -1,16 +1,30 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown } from "lucide-react";
-import { teamMembers } from "../../utils/constants";
 import Button from "../ui/Button";
 import TeamImage from "../ui/TeamImage";
+import { useContent } from "../../hooks/useContent"; // Add this import
 
 const Team = ({ openContactModal }) => {
+  const { content, loading } = useContent(); // Add this hook
   const [expandedCard, setExpandedCard] = useState(null);
 
   const toggleCard = (index) => {
     setExpandedCard(expandedCard === index ? null : index);
   };
+
+  if (loading) {
+    return (
+      <section id="team" className="py-20 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto text-center">
+          <div className="text-gray-300">Loading team information...</div>
+        </div>
+      </section>
+    );
+  }
+
+  // Use dynamic team data from API
+  const teamMembers = content?.team || [];
 
   return (
     <section id="team" className="py-20 px-4 sm:px-6 lg:px-8">
@@ -37,7 +51,7 @@ const Team = ({ openContactModal }) => {
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {teamMembers.map((member, index) => (
             <motion.div
-              key={index}
+              key={member.id || index}
               className="group"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -47,21 +61,23 @@ const Team = ({ openContactModal }) => {
             >
               <motion.div
                 className={`bg-gray-900/50 rounded-3xl border border-gray-800 overflow-hidden cursor-pointer transition-all duration-500 hover:border-gray-600 hover:shadow-2xl h-full flex flex-col ${
-                  expandedCard === index ? 'border-yellow-400/50 shadow-xl shadow-yellow-400/10' : 'group-hover:scale-105'
+                  expandedCard === index
+                    ? "border-yellow-400/50 shadow-xl shadow-yellow-400/10"
+                    : "group-hover:scale-105"
                 }`}
                 onClick={() => toggleCard(index)}
                 layout
                 transition={{
-                  layout: { duration: 0.6, ease: [0.4, 0.0, 0.2, 1] }
+                  layout: { duration: 0.6, ease: [0.4, 0.0, 0.2, 1] },
                 }}
               >
                 {/* Image Section */}
                 <TeamImage
                   src={member.image}
                   fallback={member.imageFallback}
-                  alt={member.alt}
-                  gradientFrom={member.gradientFrom}
-                  gradientTo={member.gradientTo}
+                  alt={member.alt || `${member.name} - ${member.title}`}
+                  gradientFrom={member.gradientFrom || "from-red-500"}
+                  gradientTo={member.gradientTo || "to-yellow-400"}
                 />
 
                 {/* Content Section */}
@@ -73,7 +89,11 @@ const Team = ({ openContactModal }) => {
                           {member.name}
                         </h3>
                         <p
-                          className={`text-lg font-semibold bg-gradient-to-r ${member.gradientFrom} ${member.gradientTo} bg-clip-text text-transparent mb-1`}
+                          className={`text-lg font-semibold bg-gradient-to-r ${
+                            member.gradientFrom || "from-red-500"
+                          } ${
+                            member.gradientTo || "to-yellow-400"
+                          } bg-clip-text text-transparent mb-1`}
                         >
                           {member.title}
                         </p>
@@ -81,17 +101,19 @@ const Team = ({ openContactModal }) => {
                           {member.subtitle}
                         </p>
                       </div>
-                      
+
                       {/* Expand/Collapse Indicator */}
                       <motion.div
                         className="ml-4 flex-shrink-0"
                         animate={{ rotate: expandedCard === index ? 180 : 0 }}
                         transition={{ duration: 0.3, ease: "easeInOut" }}
                       >
-                        <ChevronDown 
+                        <ChevronDown
                           className={`w-6 h-6 transition-colors duration-300 ${
-                            expandedCard === index ? 'text-yellow-400' : 'text-gray-500'
-                          }`} 
+                            expandedCard === index
+                              ? "text-yellow-400"
+                              : "text-gray-500"
+                          }`}
                         />
                       </motion.div>
                     </div>
@@ -111,34 +133,40 @@ const Team = ({ openContactModal }) => {
                           initial={{ opacity: 0, height: 0 }}
                           animate={{ opacity: 1, height: "auto" }}
                           exit={{ opacity: 0, height: 0 }}
-                          transition={{ 
-                            duration: 0.5, 
+                          transition={{
+                            duration: 0.5,
                             ease: [0.4, 0.0, 0.2, 1],
-                            opacity: { duration: 0.3, delay: 0.1 }
+                            opacity: { duration: 0.3, delay: 0.1 },
                           }}
                           className="overflow-hidden"
                         >
                           <p className="text-gray-300 text-sm leading-relaxed mb-6">
                             {member.bio}
                           </p>
-                          
+
                           {/* Enhanced Specialties for Expanded View */}
                           <div className="mb-4">
                             <h4 className="text-white font-semibold mb-3 text-sm uppercase tracking-wide">
                               Specialties
                             </h4>
                             <div className="flex flex-wrap gap-2">
-                              {member.specialties.map((specialty, idx) => (
-                                <motion.span
-                                  key={idx}
-                                  initial={{ opacity: 0, scale: 0.8 }}
-                                  animate={{ opacity: 1, scale: 1 }}
-                                  transition={{ delay: idx * 0.1 }}
-                                  className={`px-3 py-2 bg-gradient-to-r ${member.gradientFrom} ${member.gradientTo} bg-opacity-10 text-white text-xs rounded-full border border-gray-600 hover:border-gray-500 transition-all duration-200`}
-                                >
-                                  {specialty}
-                                </motion.span>
-                              ))}
+                              {(member.specialties || []).map(
+                                (specialty, idx) => (
+                                  <motion.span
+                                    key={idx}
+                                    initial={{ opacity: 0, scale: 0.8 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    transition={{ delay: idx * 0.1 }}
+                                    className={`px-3 py-2 bg-gradient-to-r ${
+                                      member.gradientFrom || "from-red-500"
+                                    } ${
+                                      member.gradientTo || "to-yellow-400"
+                                    } bg-opacity-10 text-white text-xs rounded-full border border-gray-600 hover:border-gray-500 transition-all duration-200`}
+                                  >
+                                    {specialty}
+                                  </motion.span>
+                                )
+                              )}
                             </div>
                           </div>
 
@@ -175,15 +203,17 @@ const Team = ({ openContactModal }) => {
                           {/* Specialties Tags - Fixed Height */}
                           <div className="h-12 mb-4 flex items-start">
                             <div className="flex flex-wrap gap-2">
-                              {member.specialties.slice(0, 2).map((specialty, idx) => (
-                                <span
-                                  key={idx}
-                                  className="px-3 py-1 bg-gray-800 text-gray-400 text-xs rounded-full border border-gray-700"
-                                >
-                                  {specialty}
-                                </span>
-                              ))}
-                              {member.specialties.length > 2 && (
+                              {(member.specialties || [])
+                                .slice(0, 2)
+                                .map((specialty, idx) => (
+                                  <span
+                                    key={idx}
+                                    className="px-3 py-1 bg-gray-800 text-gray-400 text-xs rounded-full border border-gray-700"
+                                  >
+                                    {specialty}
+                                  </span>
+                                ))}
+                              {(member.specialties || []).length > 2 && (
                                 <span className="px-3 py-1 bg-gray-800 text-gray-400 text-xs rounded-full border border-gray-700">
                                   +{member.specialties.length - 2} more
                                 </span>
@@ -193,7 +223,7 @@ const Team = ({ openContactModal }) => {
 
                           {/* Read More Hint - Fixed Height */}
                           <div className="h-8 flex items-center justify-center border-t border-gray-800 pt-2">
-                            <motion.div 
+                            <motion.div
                               className="text-center"
                               whileHover={{ scale: 1.02 }}
                             >

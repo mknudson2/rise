@@ -2,8 +2,27 @@ import React from "react";
 import { motion } from "framer-motion";
 import { Phone, Mail, MapPin } from "lucide-react";
 import Button from "../ui/Button";
+import { useContent } from "../../hooks/useContent"; // Add this import
 
 const Contact = ({ openContactModal }) => {
+  const { content, loading } = useContent(); // Add this hook
+
+  if (loading) {
+    return (
+      <section
+        id="contact"
+        className="py-16 sm:py-20 px-4 sm:px-6 lg:px-8 bg-gray-900/30"
+      >
+        <div className="max-w-4xl mx-auto text-center">
+          <div className="text-gray-300">Loading contact information...</div>
+        </div>
+      </section>
+    );
+  }
+
+  // Use dynamic contact data from API
+  const contactData = content?.contact || {};
+
   return (
     <section
       id="contact"
@@ -18,7 +37,7 @@ const Contact = ({ openContactModal }) => {
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
         >
-          Ready to Transform Your Life with{" "}
+          {contactData.title || "Ready to Transform Your Life with"}{" "}
           <span className="bg-gradient-to-r from-red-500 to-yellow-400 bg-clip-text text-transparent">
             RISE
           </span>
@@ -33,8 +52,8 @@ const Contact = ({ openContactModal }) => {
           transition={{ duration: 0.8, delay: 0.2 }}
           viewport={{ once: true }}
         >
-          Take the first step toward recovery or professional development. Our
-          team is here to help you achieve what you thought was impossible.
+          {contactData.subtitle ||
+            "Take the first step toward recovery or professional development. Our team is here to help you achieve what you thought was impossible."}
         </motion.p>
 
         {/* Mobile-optimized button layout */}
@@ -70,22 +89,25 @@ const Contact = ({ openContactModal }) => {
           transition={{ duration: 0.8, delay: 0.6 }}
           viewport={{ once: true }}
         >
-          <div className="flex items-center gap-3 justify-center sm:justify-start">
-            <Phone size={18} className="text-yellow-400 flex-shrink-0" />
-            <span className="text-sm sm:text-base">
-              Contact for phone number
-            </span>
-          </div>
-          <div className="flex items-center gap-3 justify-center sm:justify-start">
-            <Mail size={18} className="text-yellow-400 flex-shrink-0" />
-            <span className="text-sm sm:text-base break-all">
-              info@risechangeslives.com
-            </span>
-          </div>
-          <div className="flex items-center gap-3 justify-center sm:justify-start">
-            <MapPin size={18} className="text-yellow-400 flex-shrink-0" />
-            <span className="text-sm sm:text-base">Multiple locations</span>
-          </div>
+          {(contactData.contactInfo || []).map((info, index) => (
+            <div
+              key={index}
+              className="flex items-center gap-3 justify-center sm:justify-start"
+            >
+              {info.icon === "phone" && (
+                <Phone size={18} className="text-yellow-400 flex-shrink-0" />
+              )}
+              {info.icon === "email" && (
+                <Mail size={18} className="text-yellow-400 flex-shrink-0" />
+              )}
+              {info.icon === "location" && (
+                <MapPin size={18} className="text-yellow-400 flex-shrink-0" />
+              )}
+              <span className="text-sm sm:text-base break-all">
+                {info.value}
+              </span>
+            </div>
+          ))}
         </motion.div>
 
         {/* Mobile-optimized emergency notice */}
@@ -97,14 +119,8 @@ const Contact = ({ openContactModal }) => {
           viewport={{ once: true }}
         >
           <p className="text-red-300 text-sm sm:text-base font-medium leading-relaxed">
-            <strong className="block sm:inline mb-1 sm:mb-0">
-              Medical Emergency:
-            </strong>
-            <span className="block sm:inline">
-              {" "}
-              If you are experiencing a medical emergency, please call 911 or go
-              to your nearest emergency room immediately.
-            </span>
+            {contactData.emergencyNotice ||
+              "Medical Emergency: If you are experiencing a medical emergency, please call 911 or go to your nearest emergency room immediately."}
           </p>
         </motion.div>
       </div>

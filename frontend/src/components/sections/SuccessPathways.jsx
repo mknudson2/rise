@@ -1,7 +1,20 @@
 import React from "react";
 import { motion } from "framer-motion";
+import { useContent } from "../../hooks/useContent";
 
 const SuccessPathways = ({ openContactModal }) => {
+  const { content, loading } = useContent();
+
+  if (loading) {
+    return (
+      <section className="min-h-screen flex items-center justify-center bg-gray-950">
+        <div className="text-white text-xl">Loading...</div>
+      </section>
+    );
+  }
+
+  const pathwaysData = content?.successPathways || {};
+
   return (
     <section id="programs" className="py-20 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
@@ -12,14 +25,14 @@ const SuccessPathways = ({ openContactModal }) => {
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
         >
-          Success{" "}
+          {pathwaysData.title || "Success"}{" "}
           <span className="bg-gradient-to-r from-red-500 to-yellow-400 bg-clip-text text-transparent">
             Pathways
           </span>
         </motion.h2>
 
         <div className="grid md:grid-cols-2 gap-12">
-          {/* For Survivors */}
+          {/* For Survivors - NOW USING DYNAMIC DATA */}
           <motion.div
             className="bg-gray-900/50 p-8 rounded-2xl border border-gray-800"
             initial={{ opacity: 0, x: -20 }}
@@ -28,27 +41,26 @@ const SuccessPathways = ({ openContactModal }) => {
             viewport={{ once: true }}
           >
             <h3 className="text-2xl font-bold mb-4 text-white">
-              …as a stroke / SCI survivor
+              {pathwaysData.survivor?.title || "…as a stroke / SCI survivor"}
             </h3>
 
-            {/* Replaced placeholder with actual image */}
             <div className="w-full h-64 rounded-lg mb-6 overflow-hidden">
               <img
-                src="/assets/images/survivor.jpg"
+                src={
+                  pathwaysData.survivor?.image || "/assets/images/survivor.jpg"
+                }
                 alt="Stroke and SCI survivors participating in RISE recovery training"
                 className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
               />
             </div>
 
             <p className="text-gray-300 leading-relaxed">
-              Greatness is not a function of your situation. Greatness is
-              largely a matter of choice and discipline. If you've had a Stroke
-              or SCI and you're ready to achieve greatness, we're a click away
-              from being your greatest resource.
+              {pathwaysData.survivor?.description ||
+                "Greatness is not a function of your situation. Greatness is largely a matter of choice and discipline. If you've had a Stroke or SCI and you're ready to achieve greatness, we're a click away from being your greatest resource."}
             </p>
           </motion.div>
 
-          {/* For Trainers */}
+          {/* For Trainers - NOW USING DYNAMIC DATA */}
           <motion.div
             className="bg-gray-900/50 p-8 rounded-2xl border border-gray-800"
             initial={{ opacity: 0, x: 20 }}
@@ -57,23 +69,22 @@ const SuccessPathways = ({ openContactModal }) => {
             viewport={{ once: true }}
           >
             <h3 className="text-2xl font-bold mb-4 text-white">
-              …as a trainer
+              {pathwaysData.trainer?.title || "…as a trainer"}
             </h3>
 
-            {/* Replaced placeholder with actual image */}
             <div className="w-full h-64 rounded-lg mb-6 overflow-hidden">
               <img
-                src="/assets/images/trainer.webp"
+                src={
+                  pathwaysData.trainer?.image || "/assets/images/trainer.webp"
+                }
                 alt="Healthcare professionals learning RISE training methodologies"
                 className="w-full h-full object-cover object-top hover:scale-105 transition-transform duration-300"
               />
             </div>
 
             <p className="text-gray-300 leading-relaxed">
-              No exercise is better for the heart than reaching out and lifting
-              others up. If you're a student or healthcare professional and
-              interested in unlocking your skills while transforming people's
-              lives, we're currently accepting applicants.
+              {pathwaysData.trainer?.description ||
+                "No exercise is better for the heart than reaching out and lifting others up. If you're a student or healthcare professional and interested in unlocking your skills while transforming people's lives, we're currently accepting applicants."}
             </p>
           </motion.div>
         </div>
